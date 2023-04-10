@@ -17,7 +17,6 @@
     "next": "13.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "styles": "link:./src/styles",
     "typescript": "4.9.5"
   },
   "devDependencies": {
@@ -44,6 +43,5 @@
       "vitest related --run"
     ],
     "*.{js,ts,tsx,css,md}": "prettier --write"
-  },
-  "packageManager": "yarn@3.5.0"
+  }
 }
