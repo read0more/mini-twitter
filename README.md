@@ -1,13 +1,19 @@
-# my-next-template
+# 요구사항
 
-next 프로젝트 시작할 때 개발 환경 다시 설정하기 귀찮아서 만든 template 레파지토리.
+## /create-account :
 
-`yarn PnP + eslint(airbnb) + prettier + vitest + lint-staged`적용
+- [ ] 계정을 생성하는 페이지입니다.
 
-# Getting Started
+## /log-in :
 
-### PnP라 zero-install이지만 lint-staged 관련해서는 추가로 설정해줘야 합니다.
+- [ ] 로그인을 진행하는 페이지입니다.
 
-1. yarn husky install
-2. ./husky/pre-commit 파일을 열어보면 undefined가 생겼을 수도 있는데, 있다면 제거한다.
-3. yarn husky add .husky/pre-commit
+## /:
+
+- [ ] 로그인 여부를 확인하여 로그인이 되어있다면 홈페이지를 그렇지 않다면 계정 생성 / 로그인 페이지로 이동하세요.
+- [ ] 로그인이 완료되었을 경우, 사용자는 데이터베이스에 존재하는 모든 트윗을 볼 수 있어야 합니다. 또한 트윗을 작성할 수 있어야 합니다.
+
+## /tweet/[id]:
+
+- [ ] 사용자는 id에 해당하는 트윗의 내용과 좋아요 버튼을 볼 수 있어야 합니다.
+      좋아요버튼을 클릭했 을 경우 좋아요의 상태값이 데이터베이스에 저장되어야 하며 useSWR의 mutate를 사용하여 업데이트를 반영해야 합니다.
