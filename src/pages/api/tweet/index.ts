@@ -14,7 +14,7 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   if (req.method === 'POST') {
-    const id = req.session.user?.id ?? 0;
+    const id = req.session.user?.id;
     try {
       const result = schema.parse(req.body);
       const user = await prismaClient.user.findUnique({
@@ -22,13 +22,6 @@ async function handler(
           id,
         },
       });
-
-      if (!user) {
-        return res.status(401).json({
-          ok: false,
-          error: '로그인이 필요합니다.',
-        });
-      }
 
       const tweet = await prismaClient.tweet.create({
         data: {

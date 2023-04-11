@@ -7,19 +7,12 @@ async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
-  const id = req.session.user?.id ?? 0;
+  const id = req.session.user?.id;
   const user = await prismaClient.user.findUnique({
     where: {
       id,
     },
   });
-
-  if (!user) {
-    return res.status(401).json({
-      ok: false,
-      error: '로그인이 필요합니다.',
-    });
-  }
 
   return res.status(200).json({
     ok: true,

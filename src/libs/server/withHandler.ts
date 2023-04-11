@@ -33,7 +33,9 @@ export default function withHandler({
       return res.status(405).end();
     }
 
-    // TODO: iron-session 적용하면 private에 대한 처리
+    if (isPrivate && !req.session.user) {
+      return res.status(401).json({ ok: false, error: '로그인이 필요합니다.' });
+    }
 
     try {
       await handler(req, res);
