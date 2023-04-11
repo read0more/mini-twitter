@@ -8,6 +8,7 @@ const schema = z.object({
   text: z.string().min(1, '내용을 입력해주세요.'),
 });
 
+const SIZE = 10;
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
@@ -58,10 +59,18 @@ async function handler(
       });
     }
   } else {
-    // TODO: pagination
+    const { page: _page } = req.query;
+    const page = Number(_page) || 1;
+
     const tweets = await prismaClient.tweet.findMany({
-      take: 10,
-      skip: 0,
+      take: SIZE,
+      skip: (page - 1) * SIZE,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        user: true,
+      },
     });
 
     return res.status(200).json({
