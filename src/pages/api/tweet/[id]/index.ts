@@ -23,6 +23,13 @@ async function handler(
       },
     });
 
+    if (!tweet) {
+      return res.status(404).json({
+        ok: false,
+        error: 'Tweet not found',
+      });
+    }
+
     return res.status(200).json({
       ok: true,
       tweet,
