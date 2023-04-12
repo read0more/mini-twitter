@@ -5,14 +5,26 @@ import { User } from '@prisma/client';
 
 interface ProfileResponse {
   ok: boolean;
-  user: User;
+  user?: User;
 }
 
-export default function useUser() {
+export default function useUser({ redirectIfNotFound = true } = {}) {
   const { data, error, mutate } = useSWR<ProfileResponse>('/api/users/me');
   const router = useRouter();
+
+  const logout = async () => {
+    const response = await fetch('/api/users/logout');
+    const result = await response.json();
+
+    if (result.ok) {
+      return mutate({ ok: false }, false);
+    }
+
+    throw new Error('Unknown error');
+  };
+
   useEffect(() => {
-    if (data && !data.ok) {
+    if (redirectIfNotFound && data && !data.ok) {
       router.replace('/log-in');
     } else if (data?.user) {
       mutate(
@@ -22,6 +34,7 @@ export default function useUser() {
         false
       );
     }
-  }, [data, router, mutate]);
-  return { user: data?.user, isLoading: !data && !error };
+  }, [data, router, mutate, redirectIfNotFound]);
+
+  return { user: data?.user, isLoading: !data && !error, logout };
 }
