@@ -1,6 +1,7 @@
 import Layout from '@/components/layout';
 import type { NextPage } from 'next';
 import useUser from '@/libs/client/useUser';
+import List from '@/components/Tweets/list';
 
 const Home: NextPage = () => {
   const { user, isLoading, logout } = useUser();
@@ -8,6 +9,7 @@ const Home: NextPage = () => {
   if (isLoading) return <div>로딩중...</div>;
   return (
     <Layout>
+      <List />
       <div>{JSON.stringify(user)}</div>
       <button onClick={logout}>logout</button>
     </Layout>
