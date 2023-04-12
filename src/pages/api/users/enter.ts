@@ -3,11 +3,7 @@ import prismaClient from '@/libs/server/prismaClient';
 import withHandler, { ResponseType } from '@/libs/server/withHandler';
 import z from 'zod';
 import { withApiSession } from '@/libs/server/withSession';
-
-const schema = z.object({
-  email: z.string().email(),
-  name: z.string().optional().default(''),
-});
+import schema from '@/schemas/users/enter';
 
 async function handler(
   req: NextApiRequest,
@@ -34,26 +30,26 @@ async function handler(
       },
     });
 
-    const sendMailResult = await fetch(process.env.SEND_MAIL_URL!, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        payload,
-      }),
-    });
+    // const sendMailResult = await fetch(process.env.SEND_MAIL_URL!, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     email,
+    //     payload,
+    //   }),
+    // });
 
-    if (!sendMailResult.ok) {
-      throw new z.ZodError([
-        {
-          code: 'custom',
-          path: [],
-          message: '메일 발송에 실패했습니다.',
-        },
-      ]);
-    }
+    // if (!sendMailResult.ok) {
+    //   throw new z.ZodError([
+    //     {
+    //       code: 'custom',
+    //       path: [],
+    //       message: '메일 발송에 실패했습니다.',
+    //     },
+    //   ]);
+    // }
 
     return res.status(200).json({
       ok: true,

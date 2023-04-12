@@ -1,7 +1,16 @@
-import type { NextPage } from 'next';
+import Layout from '@/components/layout';
+import type { NextPage, NextPageContext } from 'next';
+import useUser from '@/libs/client/useUser';
 
 const Home: NextPage = () => {
-  return <div className="text-red-300">123</div>;
+  const { isLoading } = useUser();
+
+  if (isLoading) return <div>로딩중...</div>;
+  return (
+    <Layout>
+      <div>123</div>
+    </Layout>
+  );
 };
 
 export default Home;

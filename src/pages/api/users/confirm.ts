@@ -3,11 +3,7 @@ import prismaClient from '@/libs/server/prismaClient';
 import withHandler, { ResponseType } from '@/libs/server/withHandler';
 import z from 'zod';
 import { withApiSession } from '@/libs/server/withSession';
-
-const schema = z.object({
-  email: z.string().email(),
-  payload: z.string(),
-});
+import schema from '@/schemas/users/confirm';
 
 async function handler(
   req: NextApiRequest,
