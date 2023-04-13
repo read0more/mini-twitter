@@ -1,9 +1,10 @@
 import { TweetWithUserAndFavorite } from '@/libs/client/useTweets';
-import React from 'react';
+import React, { useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import useMutation from '@/libs/client/useMutation';
 import { withSsrSession } from '@/libs/server/withSession';
 import routeGuard from '@/libs/server/routeGuard';
+import { useRouter } from 'next/router';
 
 interface TweetResponse {
   ok: boolean;
@@ -11,6 +12,7 @@ interface TweetResponse {
 }
 
 export default function TweetDetail({ id }: { id: number }) {
+  const router = useRouter();
   const { cache } = useSWRConfig();
   const tweetCache = cache.get('/api/tweet')?.data
     ?.tweets as TweetWithUserAndFavorite[];
@@ -46,6 +48,13 @@ export default function TweetDetail({ id }: { id: number }) {
     );
     toggleFavorite({});
   };
+
+  useEffect(() => {
+    if (!data?.ok) {
+      alert('존재하지 않는 트윗입니다.');
+      router.replace('/');
+    }
+  }, [data, router]);
 
   return (
     <article>
