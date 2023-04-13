@@ -3,10 +3,7 @@ import prismaClient from '@/libs/server/prismaClient';
 import withHandler, { ResponseType } from '@/libs/server/withHandler';
 import z from 'zod';
 import { withApiSession } from '@/libs/server/withSession';
-
-const schema = z.object({
-  id: z.coerce.number(),
-});
+import schema from '@/schemas/tweets/detail';
 
 async function handler(
   req: NextApiRequest,
@@ -20,6 +17,19 @@ async function handler(
       },
       include: {
         user: true,
+        favorites: {
+          select: {
+            id: true,
+          },
+          where: {
+            userId: req.session.user?.id,
+          },
+        },
+        _count: {
+          select: {
+            favorites: true,
+          },
+        },
       },
     });
 

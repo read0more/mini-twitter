@@ -1,19 +1,23 @@
 import useSWR from 'swr';
-import { Tweet, User } from '@prisma/client';
+import { Tweet, User, Favorite } from '@prisma/client';
 
-export interface TweetWithUser extends Tweet {
+export interface TweetWithUserAndFavorite extends Tweet {
   user: User;
+  favorites: Pick<Favorite, 'id'>[];
+  _count: {
+    favs: number;
+  };
 }
 
 interface TweetsResponse {
   ok: boolean;
-  tweets?: TweetWithUser[];
+  tweets?: TweetWithUserAndFavorite[];
 }
 
 export default function useTweets() {
   const { data, error, mutate } = useSWR<TweetsResponse>('/api/tweet');
 
-  const optimisticUpdate = (newTweet: TweetWithUser) => {
+  const optimisticUpdate = (newTweet: TweetWithUserAndFavorite) => {
     mutate(
       {
         ok: true,
