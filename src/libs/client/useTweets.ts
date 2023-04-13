@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { Tweet, User } from '@prisma/client';
 
@@ -12,11 +11,26 @@ interface TweetsResponse {
 }
 
 export default function useTweets() {
-  const { data, error } = useSWR<TweetsResponse>('/api/tweet');
+  const { data, error, mutate } = useSWR<TweetsResponse>('/api/tweet');
+
+  const optimisticUpdate = (newTweet: TweetWithUser) => {
+    mutate(
+      {
+        ok: true,
+        tweets: [newTweet, ...(data?.tweets || [])],
+      },
+      false
+    );
+  };
 
   const getTweetById = (id: number) => {
     return data?.tweets?.find((tweet) => tweet.id === id);
   };
 
-  return { tweets: data?.tweets, isLoading: !data && !error, getTweetById };
+  return {
+    tweets: data?.tweets,
+    isLoading: !data && !error,
+    getTweetById,
+    optimisticUpdate,
+  };
 }

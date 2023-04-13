@@ -3,10 +3,7 @@ import prismaClient from '@/libs/server/prismaClient';
 import withHandler, { ResponseType } from '@/libs/server/withHandler';
 import z from 'zod';
 import { withApiSession } from '@/libs/server/withSession';
-
-const schema = z.object({
-  text: z.string().min(1, '내용을 입력해주세요.'),
-});
+import schema from '@/schemas/tweets/create';
 
 const SIZE = 10;
 async function handler(
