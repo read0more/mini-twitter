@@ -5,18 +5,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import useMutation from '@/libs/client/useMutation';
 import { ResponseType } from '@/libs/server/withHandler';
 import useTweets from '@/libs/client/useTweets';
-import useUser from '@/libs/client/useUser';
+import { TweetWithUserAndFavorite } from '@/libs/client/useTweets';
+
+type TweetResponseType = ResponseType & {
+  tweet: TweetWithUserAndFavorite;
+};
 
 export default function PostTweetForm() {
-  const { optimisticUpdate } = useTweets();
-  const { user } = useUser();
+  const { tweets, optimisticUpdate } = useTweets();
   const [isCreateTweet, setIsCreateTweet] = useState(false);
   const [mutation, { loading: createTweetLoading, data }] =
-    useMutation<ResponseType>('api/tweet');
+    useMutation<TweetResponseType>('api/tweet');
   const {
     register,
     handleSubmit,
     setError,
+    reset,
     formState: { errors },
   } = useForm<SchemaType>({
     resolver: zodResolver(schema),
@@ -27,23 +31,10 @@ export default function PostTweetForm() {
   };
 
   useEffect(() => {
-    if (data?.ok && user) {
+    if (data?.ok && tweets[0].id !== data.tweet.id) {
+      reset();
       setIsCreateTweet(false);
-      const currentDate = new Date();
-      optimisticUpdate({
-        id: data.id,
-        text: data.text,
-        createdAt: currentDate,
-        updatedAt: currentDate,
-        userId: user.id,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-        },
-      });
+      optimisticUpdate(data.tweet);
       return;
     }
 
@@ -53,7 +44,7 @@ export default function PostTweetForm() {
         message: '작성에 실패했습니다.',
       });
     }
-  }, [setIsCreateTweet, data, setError]);
+  }, [setIsCreateTweet, data, setError, reset, tweets, optimisticUpdate]);
 
   return (
     <>

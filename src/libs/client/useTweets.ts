@@ -32,7 +32,7 @@ export default function useTweets() {
   };
 
   return {
-    tweets: data?.tweets,
+    tweets: data?.tweets ?? [],
     isLoading: !data && !error,
     getTweetById,
     optimisticUpdate,

@@ -29,6 +29,9 @@ async function handler(
             },
           },
         },
+        include: {
+          user: true,
+        },
       });
 
       return res.status(200).json({
