@@ -1,15 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prismaClient from '@/libs/server/prismaClient';
 import withHandler, { ResponseType } from '@/libs/server/withHandler';
-import z from 'zod';
 import { withApiSession } from '@/libs/server/withSession';
 import schema from '@/schemas/tweets/detail';
+import withError from '@/libs/server/withError';
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
-  try {
+  async function insideHandler() {
     const { id } = schema.parse(req.query);
     const tweet = await prismaClient.tweet.findUnique({
       where: {
@@ -44,19 +44,9 @@ async function handler(
       ok: true,
       tweet,
     });
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      return res.status(400).json({
-        ok: false,
-        error: e.issues,
-      });
-    }
-
-    return res.status(500).json({
-      ok: false,
-      error: 'Unknown error',
-    });
   }
+
+  withError(req, res)(insideHandler);
 }
 
 export default withApiSession(

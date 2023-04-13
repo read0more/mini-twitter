@@ -16,7 +16,7 @@ export default function TweetDetail({ id }: { id: number }) {
   const { cache } = useSWRConfig();
   const tweetCache = cache.get('/api/tweet')?.data
     ?.tweets as TweetWithUserAndFavorite[];
-  const { data, mutate } = useSWR<TweetResponse>(
+  const { data, mutate, isLoading } = useSWR<TweetResponse>(
     tweetCache ? null : `/api/tweet/${id}`
   );
   const tweet = tweetCache ? tweetCache.find((t) => t.id === id) : data?.tweet;
@@ -50,11 +50,11 @@ export default function TweetDetail({ id }: { id: number }) {
   };
 
   useEffect(() => {
-    if (!data?.ok) {
+    if (!data?.ok && !isLoading && !tweet) {
       alert('존재하지 않는 트윗입니다.');
       router.replace('/');
     }
-  }, [data, router]);
+  }, [data, router, isLoading, tweet]);
 
   return (
     <article>

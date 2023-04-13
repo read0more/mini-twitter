@@ -3,6 +3,7 @@ import prismaClient from '@/libs/server/prismaClient';
 import withHandler, { ResponseType } from '@/libs/server/withHandler';
 import z from 'zod';
 import { withApiSession } from '@/libs/server/withSession';
+import withError from '@/libs/server/withError';
 
 const schema = z.object({
   id: z.coerce.number(),
@@ -12,7 +13,7 @@ async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
-  try {
+  async function insideHandler() {
     const { id } = schema.parse(req.query);
     const alreadyFav = await prismaClient.favorite.findFirst({
       where: {
@@ -47,19 +48,9 @@ async function handler(
     return res.status(200).json({
       ok: true,
     });
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      return res.status(400).json({
-        ok: false,
-        error: e.issues,
-      });
-    }
-
-    return res.status(500).json({
-      ok: false,
-      error: 'Unknown error',
-    });
   }
+
+  withError(req, res)(insideHandler);
 }
 
 export default withApiSession(

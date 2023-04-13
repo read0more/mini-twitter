@@ -9,7 +9,7 @@ interface Props {
 
 export default function Item({ tweet, getTweetById }: Props) {
   return (
-    <li onClick={() => console.log(getTweetById(tweet.id))} className="border">
+    <li className="border">
       <h2>
         {tweet.user.email} / {tweet.user.name}
       </h2>

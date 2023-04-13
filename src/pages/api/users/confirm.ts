@@ -4,12 +4,13 @@ import withHandler, { ResponseType } from '@/libs/server/withHandler';
 import z from 'zod';
 import { withApiSession } from '@/libs/server/withSession';
 import schema from '@/schemas/users/confirm';
+import withError from '@/libs/server/withError';
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
-  try {
+  async function insideHandler() {
     const { payload, email } = schema.parse(req.body);
     const foundTokens = await prismaClient.token.findMany({
       where: {
@@ -48,19 +49,9 @@ async function handler(
     });
 
     res.json({ ok: true, user: foundTokens[0].user });
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      return res.status(400).json({
-        ok: false,
-        error: e.issues,
-      });
-    }
-
-    return res.status(500).json({
-      ok: false,
-      error: 'Unknown error',
-    });
   }
+
+  withError(req, res)(insideHandler);
 }
 
 export default withApiSession(

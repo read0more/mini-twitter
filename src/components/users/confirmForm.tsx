@@ -46,7 +46,7 @@ export default function ConfirmForm({ email }: Props) {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit, console.log)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <label>
           <input type="text" {...register('payload')} />
           {errors.payload && (

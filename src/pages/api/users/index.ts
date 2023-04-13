@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import prismaClient from '@/libs/server/prismaClient';
 import withHandler, { ResponseType } from '@/libs/server/withHandler';
 import z from 'zod';
+import withError from '@/libs/server/withError';
 
 const schema = z.object({
   email: z.string().email(),
@@ -15,7 +16,7 @@ async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
-  try {
+  async function insideHandler() {
     const userFromBody = schema.parse(req.body);
     const existUser = await prismaClient.user.findFirst({
       where: {
@@ -41,19 +42,9 @@ async function handler(
       ok: true,
       user,
     });
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      return res.status(400).json({
-        ok: false,
-        error: e.issues,
-      });
-    }
-
-    return res.status(500).json({
-      ok: false,
-      error: 'Unknown error',
-    });
   }
+
+  withError(req, res)(insideHandler);
 }
 
 export default withHandler({
