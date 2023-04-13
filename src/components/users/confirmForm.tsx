@@ -15,7 +15,7 @@ export default function ConfirmForm({ email }: Props) {
   const router = useRouter();
   const [mutation, { loading, data, error: tokenCheckError }] =
     useMutation<ResponseType>('api/users/confirm');
-  const { mutate: mutateUser } = useUser({ redirectIfNotFound: false });
+  const { mutate: mutateUser } = useUser();
 
   const {
     register,

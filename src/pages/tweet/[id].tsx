@@ -1,8 +1,9 @@
 import { TweetWithUserAndFavorite } from '@/libs/client/useTweets';
 import React from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { GetServerSidePropsContext } from 'next';
 import useMutation from '@/libs/client/useMutation';
+import { withSsrSession } from '@/libs/server/withSession';
+import routeGuard from '@/libs/server/routeGuard';
 
 interface TweetResponse {
   ok: boolean;
@@ -13,7 +14,7 @@ export default function TweetDetail({ id }: { id: number }) {
   const { cache } = useSWRConfig();
   const tweetCache = cache.get('/api/tweet')?.data
     ?.tweets as TweetWithUserAndFavorite[];
-  const { data, error, mutate } = useSWR<TweetResponse>(
+  const { data, mutate } = useSWR<TweetResponse>(
     tweetCache ? null : `/api/tweet/${id}`
   );
   const tweet = tweetCache ? tweetCache.find((t) => t.id === id) : data?.tweet;
@@ -63,12 +64,12 @@ export default function TweetDetail({ id }: { id: number }) {
   );
 }
 
-export async function getServerSideProps({
-  params,
-}: GetServerSidePropsContext) {
-  return {
-    props: {
-      id: params?.id,
-    },
-  };
-}
+export const getServerSideProps = withSsrSession(
+  routeGuard('user', ({ params }) => {
+    return {
+      props: {
+        id: Number(params?.id),
+      },
+    };
+  })
+);

@@ -8,7 +8,7 @@ interface ProfileResponse {
   user?: User;
 }
 
-export default function useUser({ redirectIfNotFound = true } = {}) {
+export default function useUser() {
   const { data, error, mutate, isLoading } =
     useSWR<ProfileResponse>('/api/users/me');
   const router = useRouter();
@@ -25,9 +25,7 @@ export default function useUser({ redirectIfNotFound = true } = {}) {
   };
 
   useEffect(() => {
-    if (redirectIfNotFound && data && !data.ok) {
-      router.replace('/log-in');
-    } else if (data?.user) {
+    if (data?.user) {
       mutate(
         {
           ...data,
@@ -35,7 +33,7 @@ export default function useUser({ redirectIfNotFound = true } = {}) {
         false
       );
     }
-  }, [data, router, mutate, redirectIfNotFound, isLoading]);
+  }, [data, mutate]);
 
   return { user: data?.user, isLoading, mutate, logout };
 }

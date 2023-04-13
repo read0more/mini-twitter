@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import EnterForm from '@/components/users/enterForm';
 import ConfirmForm from '@/components/users/confirmForm';
+import { withSsrSession } from '@/libs/server/withSession';
+import routeGuard from '@/libs/server/routeGuard';
 
 type Step = 'enter' | 'confirm';
 
@@ -23,3 +25,5 @@ export default function CreateAccount() {
     </div>
   );
 }
+
+export const getServerSideProps = withSsrSession(routeGuard('guest'));
