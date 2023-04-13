@@ -9,7 +9,8 @@ interface ProfileResponse {
 }
 
 export default function useUser({ redirectIfNotFound = true } = {}) {
-  const { data, error, mutate } = useSWR<ProfileResponse>('/api/users/me');
+  const { data, error, mutate, isLoading } =
+    useSWR<ProfileResponse>('/api/users/me');
   const router = useRouter();
 
   const logout = async () => {
@@ -34,7 +35,7 @@ export default function useUser({ redirectIfNotFound = true } = {}) {
         false
       );
     }
-  }, [data, router, mutate, redirectIfNotFound]);
+  }, [data, router, mutate, redirectIfNotFound, isLoading]);
 
-  return { user: data?.user, isLoading: !data && !error, logout };
+  return { user: data?.user, isLoading, mutate, logout };
 }

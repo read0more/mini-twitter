@@ -5,6 +5,7 @@ import schema, { SchemaType } from '@/schemas/users/confirm';
 import useMutation from '@/libs/client/useMutation';
 import { ResponseType } from '@/libs/server/withHandler';
 import { useRouter } from 'next/router';
+import useUser from '@/libs/client/useUser';
 
 interface Props {
   email: string;
@@ -14,6 +15,8 @@ export default function ConfirmForm({ email }: Props) {
   const router = useRouter();
   const [mutation, { loading, data, error: tokenCheckError }] =
     useMutation<ResponseType>('api/users/confirm');
+  const { mutate: mutateUser } = useUser({ redirectIfNotFound: false });
+
   const {
     register,
     handleSubmit,
@@ -29,9 +32,17 @@ export default function ConfirmForm({ email }: Props) {
 
   useEffect(() => {
     if (data?.ok) {
+      mutateUser(
+        {
+          ok: true,
+          user: data.user,
+        },
+        false
+      );
+
       router.replace('/');
     }
-  }, [data, router]);
+  }, [data, router, loading, mutateUser]);
 
   return (
     <>

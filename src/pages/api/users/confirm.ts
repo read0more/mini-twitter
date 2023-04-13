@@ -20,6 +20,9 @@ async function handler(
       orderBy: {
         createdAt: 'desc',
       },
+      include: {
+        user: true,
+      },
     });
 
     if (!foundTokens || foundTokens[0].payload !== payload) {
@@ -44,7 +47,7 @@ async function handler(
       },
     });
 
-    res.json({ ok: true });
+    res.json({ ok: true, user: foundTokens[0].user });
   } catch (e) {
     if (e instanceof z.ZodError) {
       return res.status(400).json({
