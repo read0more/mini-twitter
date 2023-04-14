@@ -4,18 +4,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import schema, { SchemaType } from '@/schemas/users/confirm';
 import useMutation from '@/libs/client/useMutation';
 import { ResponseType } from '@/libs/server/withHandler';
-import { useRouter } from 'next/router';
-import useUser from '@/libs/client/useUser';
+import { User } from '@prisma/client';
 
 interface Props {
   email: string;
+  goToName: () => void;
+  endProcess: (user: User) => void;
 }
 
-export default function ConfirmForm({ email }: Props) {
-  const router = useRouter();
+export default function ConfirmForm({ email, goToName, endProcess }: Props) {
   const [mutation, { loading, data, error: tokenCheckError }] =
     useMutation<ResponseType>('api/users/confirm');
-  const { mutate: mutateUser } = useUser();
 
   const {
     register,
@@ -32,17 +31,9 @@ export default function ConfirmForm({ email }: Props) {
 
   useEffect(() => {
     if (data?.ok) {
-      mutateUser(
-        {
-          ok: true,
-          user: data.user,
-        },
-        false
-      );
-
-      router.replace('/');
+      data.user?.name ? endProcess(data.user) : goToName();
     }
-  }, [data, router, loading, mutateUser]);
+  });
 
   return (
     <>

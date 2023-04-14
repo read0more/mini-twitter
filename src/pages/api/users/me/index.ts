@@ -2,12 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import prismaClient from '@/libs/server/prismaClient';
 import withHandler, { ResponseType } from '@/libs/server/withHandler';
 import { withApiSession } from '@/libs/server/withSession';
-import { z } from 'zod';
 import withError from '@/libs/server/withError';
-
-const schema = z.object({
-  name: z.string(),
-});
+import schema from '@/schemas/users/setName';
 
 async function handler(
   req: NextApiRequest,
