@@ -2,11 +2,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
 
 export default function withError(req: NextApiRequest, res: NextApiResponse) {
-  return function (
+  return async function (
     handler: (req: NextApiRequest, res: NextApiResponse) => void
   ) {
     try {
-      return handler(req, res);
+      await handler(req, res);
     } catch (e) {
       if (e instanceof z.ZodError) {
         return res.status(400).json({
