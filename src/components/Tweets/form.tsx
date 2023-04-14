@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import schema, { SchemaType } from '@/schemas/tweets/create';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,12 +22,12 @@ export default function PostTweetForm() {
     handleSubmit,
     setError,
     reset,
+    setFocus,
     formState: { errors },
   } = useForm<SchemaType>({
     resolver: zodResolver(schema),
   });
   const { isOpen, toggle } = useModal();
-  const textRef = useRef<HTMLTextAreaElement>(null);
 
   const onSubmit = (data: SchemaType) => {
     mutation(data);
@@ -51,9 +51,8 @@ export default function PostTweetForm() {
 
   useEffect(() => {
     if (!isOpen) return;
-
-    textRef.current?.focus();
-  }, [isOpen]);
+    setFocus('text');
+  }, [setFocus, isOpen]);
 
   return (
     <>
@@ -63,26 +62,29 @@ export default function PostTweetForm() {
         </button>
       </div>
       <Modal isOpen={isOpen} toggle={toggle}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="h-full flex flex-col justify-between"
-        >
-          <textarea
-            className="w-full resize-none flex-1"
-            {...register('text')}
-            ref={textRef}
-          ></textarea>
-          {errors.text && (
-            <p className="text-sm text-red-600 mt-1">{errors.text.message}</p>
-          )}
-          <button
-            type="submit"
-            disabled={createTweetLoading}
-            className="bg-blue-500 rounded-b-lg text-white p-2"
+        <>
+          <form
+            onSubmit={handleSubmit(onSubmit, console.log)}
+            className="h-full flex flex-col justify-between"
           >
-            {createTweetLoading ? '전송중...' : '트윗하기'}
-          </button>
-        </form>
+            <textarea
+              className="w-full resize-none flex-1"
+              {...register('text')}
+            ></textarea>
+            <button
+              type="submit"
+              disabled={createTweetLoading}
+              className="bg-blue-500 rounded-b-lg text-white p-2"
+            >
+              {createTweetLoading ? '전송중...' : '트윗하기'}
+            </button>
+          </form>
+          {errors.text && (
+            <p className="bg-white text-sm text-red-600">
+              {errors.text.message}
+            </p>
+          )}
+        </>
       </Modal>
     </>
   );
