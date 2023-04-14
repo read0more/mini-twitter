@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import schema, { SchemaType } from '@/schemas/tweets/create';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,6 +6,8 @@ import useMutation from '@/libs/client/useMutation';
 import { ResponseType } from '@/libs/server/withHandler';
 import useTweets from '@/libs/client/useTweets';
 import { TweetWithUserAndFavorite } from '@/libs/client/useTweets';
+import useModal from '@/libs/client/useModal';
+import Modal from '@/components/modal';
 
 type TweetResponseType = ResponseType & {
   tweet: TweetWithUserAndFavorite;
@@ -13,7 +15,6 @@ type TweetResponseType = ResponseType & {
 
 export default function PostTweetForm() {
   const { tweets, optimisticUpdate } = useTweets();
-  const [isCreateTweet, setIsCreateTweet] = useState(false);
   const [mutation, { loading: createTweetLoading, data }] =
     useMutation<TweetResponseType>('api/tweet');
   const {
@@ -25,6 +26,8 @@ export default function PostTweetForm() {
   } = useForm<SchemaType>({
     resolver: zodResolver(schema),
   });
+  const { isOpen, toggle } = useModal();
+  const textRef = useRef<HTMLTextAreaElement>(null);
 
   const onSubmit = (data: SchemaType) => {
     mutation(data);
@@ -33,7 +36,7 @@ export default function PostTweetForm() {
   useEffect(() => {
     if (data?.ok && tweets[0].id !== data.tweet.id) {
       reset();
-      setIsCreateTweet(false);
+      toggle();
       optimisticUpdate(data.tweet);
       return;
     }
@@ -44,49 +47,43 @@ export default function PostTweetForm() {
         message: '작성에 실패했습니다.',
       });
     }
-  }, [setIsCreateTweet, data, setError, reset, tweets, optimisticUpdate]);
+  }, [toggle, data, setError, reset, tweets, optimisticUpdate]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    textRef.current?.focus();
+  }, [isOpen]);
 
   return (
     <>
-      <div
-        className="fixed bottom-0 right-0 m-10"
-        onClick={() => setIsCreateTweet(true)}
-      >
+      <div className="fixed bottom-0 right-0 m-10" onClick={() => toggle()}>
         <button className="bg-blue-500 text-white rounded-full w-12 h-12 flex justify-center items-center">
           +
         </button>
       </div>
-      {isCreateTweet && (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center">
-          <div className="bg-white w-1/2 h-1/2 shadow-2xl">
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="h-full flex flex-col justify-between"
-            >
-              <textarea
-                className="w-full h-full resize-none"
-                {...register('text')}
-              ></textarea>
-              {errors.text && (
-                <p className="text-sm text-red-600 mt-1">
-                  {errors.text.message}
-                </p>
-              )}
-              <button type="submit" disabled={createTweetLoading}>
-                {createTweetLoading ? '전송중...' : '트윗하기'}
-              </button>
-            </form>
-            <div
-              className="absolute top-0 right-0 m-5"
-              onClick={() => setIsCreateTweet(false)}
-            >
-              <button className="bg-blue-500 text-white rounded-full w-12 h-12 flex justify-center items-center">
-                X
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal isOpen={isOpen} toggle={toggle}>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="h-full flex flex-col justify-between"
+        >
+          <textarea
+            className="w-full resize-none flex-1"
+            {...register('text')}
+            ref={textRef}
+          ></textarea>
+          {errors.text && (
+            <p className="text-sm text-red-600 mt-1">{errors.text.message}</p>
+          )}
+          <button
+            type="submit"
+            disabled={createTweetLoading}
+            className="bg-blue-500 rounded-b-lg text-white p-2"
+          >
+            {createTweetLoading ? '전송중...' : '트윗하기'}
+          </button>
+        </form>
+      </Modal>
     </>
   );
 }
