@@ -18,23 +18,23 @@ export default function useTweets() {
   const { data, error, mutate } = useSWR<TweetsResponse>('/api/tweet');
 
   const optimisticUpdate = (newTweet: TweetWithUserAndFavorite) => {
+    const exists = data?.tweets?.find((tweet) => tweet.id === newTweet.id);
     mutate(
       {
         ok: true,
-        tweets: [newTweet, ...(data?.tweets || [])],
+        tweets: exists
+          ? data?.tweets?.map((tweet) =>
+              tweet.id === newTweet.id ? newTweet : tweet
+            )
+          : [newTweet, ...(data?.tweets || [])],
       },
       false
     );
   };
 
-  const getTweetById = (id: number) => {
-    return data?.tweets?.find((tweet) => tweet.id === id);
-  };
-
   return {
     tweets: data?.tweets ?? [],
     isLoading: !data && !error,
-    getTweetById,
     optimisticUpdate,
   };
 }

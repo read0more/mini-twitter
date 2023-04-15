@@ -31,6 +31,19 @@ async function handler(
         },
         include: {
           user: true,
+          favorites: {
+            select: {
+              id: true,
+            },
+            where: {
+              userId: req.session.user?.id,
+            },
+          },
+          _count: {
+            select: {
+              favorites: true,
+            },
+          },
         },
       });
 

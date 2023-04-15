@@ -3,14 +3,18 @@ import React from 'react';
 import Item from './item';
 
 export default function List() {
-  const { tweets, isLoading, getTweetById } = useTweets();
+  const { tweets, isLoading, optimisticUpdate } = useTweets();
   return isLoading ? (
     <div>loading...</div>
   ) : (
     <ul>
       {tweets &&
         tweets.map((tweet) => (
-          <Item key={tweet.id} tweet={tweet} getTweetById={getTweetById} />
+          <Item
+            key={tweet.id}
+            tweet={tweet}
+            optimisticUpdate={optimisticUpdate}
+          />
         ))}
     </ul>
   );

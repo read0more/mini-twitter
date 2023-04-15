@@ -13,7 +13,6 @@ const Home: NextPage = () => {
   return user ? (
     <Layout>
       <List />
-      <div>{JSON.stringify(user)}</div>
       <button onClick={logout}>logout</button>
       <PostTweetForm />
     </Layout>
