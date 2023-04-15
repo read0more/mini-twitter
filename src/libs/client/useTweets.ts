@@ -5,7 +5,7 @@ export interface TweetWithUserAndFavorite extends Tweet {
   user: User;
   favorites: Pick<Favorite, 'id'>[];
   _count: {
-    favs: number;
+    favorites: number;
   };
 }
 

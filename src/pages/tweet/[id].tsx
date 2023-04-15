@@ -40,7 +40,7 @@ export default function TweetDetail({ id }: { id: number }) {
                 },
               ],
           _count: {
-            favs: tweet._count.favs + (isLiked ? -1 : 1),
+            favorites: tweet._count.favorites + (isLiked ? -1 : 1),
           },
         },
       },
