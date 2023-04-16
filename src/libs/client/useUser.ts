@@ -18,6 +18,7 @@ export default function useUser() {
     const result = await response.json();
 
     if (result.ok) {
+      router.replace('/log-in');
       return mutate({ ok: false }, false);
     }
 
