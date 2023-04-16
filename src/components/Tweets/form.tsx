@@ -34,7 +34,7 @@ export default function PostTweetForm() {
   };
 
   useEffect(() => {
-    if (data?.ok && tweets[0].id !== data.tweet.id) {
+    if (data?.ok && tweets[0]?.id !== data.tweet.id) {
       reset();
       toggle();
       optimisticUpdate(data.tweet);
