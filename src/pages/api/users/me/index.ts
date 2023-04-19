@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import prismaClient from '@/libs/server/prismaClient';
 import withHandler, { ResponseType } from '@/libs/server/withHandler';
 import { withApiSession } from '@/libs/server/withSession';
-import withError from '@/libs/server/withError';
+
 import schema from '@/schemas/users/setName';
 
 async function handler(
@@ -10,37 +10,33 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const id = req.session.user?.id;
-  async function insideHandler() {
-    if (req.method === 'GET') {
-      const user = await prismaClient.user.findUnique({
-        where: {
-          id,
-        },
-      });
+  if (req.method === 'GET') {
+    const user = await prismaClient.user.findUnique({
+      where: {
+        id,
+      },
+    });
 
-      return res.status(200).json({
-        ok: true,
-        user,
-      });
-    } else if (req.method === 'POST') {
-      const { name } = schema.parse(req.body);
-      const user = await prismaClient.user.update({
-        where: {
-          id,
-        },
-        data: {
-          name,
-        },
-      });
+    return res.status(200).json({
+      ok: true,
+      user,
+    });
+  } else if (req.method === 'POST') {
+    const { name } = schema.parse(req.body);
+    const user = await prismaClient.user.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+      },
+    });
 
-      return res.status(200).json({
-        ok: true,
-        user,
-      });
-    }
+    return res.status(200).json({
+      ok: true,
+      user,
+    });
   }
-
-  withError(req, res)(insideHandler);
 }
 
 export default withApiSession(

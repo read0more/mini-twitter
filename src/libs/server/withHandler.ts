@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { z } from 'zod';
 
 interface SuccessResponseType {
   ok: true;
@@ -40,8 +41,14 @@ export default function withHandler({
     try {
       await handler(req, res);
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error });
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          ok: false,
+          error: error.issues,
+        });
+      }
+
+      return res.status(500).json({ ok: false, error });
     }
   };
 }
